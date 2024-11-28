@@ -2,13 +2,18 @@ package main
 
 import (
 	"flag"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 type config struct {
 	addr      string
 	staticDir string
+}
+
+type application struct {
+	logger *slog.Logger
 }
 
 // Last left off on page 77 of let's go
@@ -20,20 +25,19 @@ func main() {
 	flag.StringVar(&cfg.staticDir, "staticDir", "./ui/static", "Path to static assets")
 	flag.Parse()
 
-	mux := http.NewServeMux()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level:     slog.LevelDebug,
+		AddSource: true,
+	}))
 
-	fileServer := http.FileServer(http.Dir(cfg.staticDir))
+	app := &application{
+		logger: logger,
+	}
 
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	logger.Info("starting server", slog.String("addr", cfg.addr))
 
-	mux.HandleFunc("GET /{$}", home)
-	mux.HandleFunc("GET /snippet/view/{id}", snippetView)
-	mux.HandleFunc("GET /snippet/create", snippetCreate)
-	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
-
-	log.Printf("starting server on %s", cfg.addr)
-
-	err := http.ListenAndServe(cfg.addr, mux)
-	log.Fatal(err)
+	err := http.ListenAndServe(cfg.addr, app.routes())
+	logger.Error(err.Error())
+	os.Exit(1)
 
 }
