@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"flag"
 	"html/template"
-	"letsgo/internal/models"
 	"log/slog"
 	"net/http"
 	"os"
 
+	"letsgo/internal/models"
+
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -22,6 +24,7 @@ type application struct {
 	logger        *slog.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 // Last left off on page 221 of let's go
@@ -53,10 +56,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	logger.Info("starting server", slog.String("addr", cfg.addr))
