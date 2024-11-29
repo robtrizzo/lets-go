@@ -33,7 +33,7 @@ type application struct {
 	sessionManager *scs.SessionManager
 }
 
-// Last left off on page 221 of let's go
+// Last left off on page 297 of let's go
 
 func main() {
 	var cfg config
