@@ -81,10 +81,14 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:      cfg.addr,
-		Handler:   app.routes(),
-		ErrorLog:  slog.NewLogLogger(logger.Handler(), slog.LevelError),
-		TLSConfig: tlsConfig,
+		Addr:           cfg.addr,
+		MaxHeaderBytes: 524288, // go adds an additional 4096 bytes by default
+		Handler:        app.routes(),
+		ErrorLog:       slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig:      tlsConfig,
+		IdleTimeout:    time.Minute,
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   10 * time.Second,
 	}
 
 	logger.Info("starting server", slog.String("addr", srv.Addr))
