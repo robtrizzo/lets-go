@@ -24,7 +24,7 @@ type application struct {
 	templateCache map[string]*template.Template
 }
 
-// Last left off on page 124 of let's go
+// Last left off on page 221 of let's go
 
 func main() {
 	var cfg config
