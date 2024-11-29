@@ -1,0 +1,23 @@
+version: '3.8'
+
+name: lets-go
+
+services:
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'snippetbox'
+      MYSQL_USER: 'web'
+      MYSQL_PASSWORD: 'pass'
+      MYSQL_ROOT_PASSWORD: 'admin'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - lets-go-db:/var/lib/mysql
+
+volumes:
+  lets-go-db:
